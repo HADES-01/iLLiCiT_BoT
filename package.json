@@ -1,0 +1,20 @@
+{
+  "name": "discordbot",
+  "version": "1.0.0",
+  "description": "Discord Bot to notify about all current and upcoming contests on different Competitive Coding websites on our Illicit Coders Server\"",
+  "main": "bot.js",
+  "scripts": {
+    "test": "node bot.js"
+  },
+  "keywords": [
+    "Discord",
+    "Bot",
+    "Discord.js"
+  ],
+  "author": "Illicit Coders",
+  "license": "ISC",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "express": "^4.17.1"
+  }
+}
