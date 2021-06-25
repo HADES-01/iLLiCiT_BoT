@@ -1,7 +1,8 @@
 import express from "express";
-import axios from "axios";
 import dotenv from "dotenv";
 import Discord from "discord.js";
+import config from "./config.js";
+import getData from "./contestData.js";
 
 dotenv.config();
 let app = express();
@@ -13,16 +14,15 @@ client.on("ready", () => {
 
 client.login(process.env.TOKEN);
 
-async function getData(req, res, next) {
-  let data = await axios.get("https://kontests.net/api/v1/all");
-  console.log("Data fetched");
-  req.data = data;
-  next();
-}
-client.on("message", (message) => {
-  if (message.content === "!ping") {
-    // send back "Pong." to the channel the message was sent in
-    message.channel.send("Pong.");
+client.on("message", async (message) => {
+  if (message.content === `${config.prefix}contests`) {
+    let dat = await getData();
+    // console.log(dat);
+    dat.forEach((ele) => {
+      message.channel.send(
+        `**${ele.name}** starts in ${ele.hrs} hours and ${ele.min} minutes. Visit here :: ${ele.url}`
+      );
+    });
   }
 });
 app.listen(3000, function () {

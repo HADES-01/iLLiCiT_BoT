@@ -5,7 +5,8 @@
   "main": "bot.js",
   "type": "module",
   "scripts": {
-    "test": "node bot.js"
+    "test": "node bot.js",
+    "dev": "nodemon bot.js"
   },
   "keywords": [
     "Discord",
