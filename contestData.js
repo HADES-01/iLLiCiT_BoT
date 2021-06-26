@@ -17,6 +17,9 @@ async function getData() {
       contests.push(contest);
     }
   });
+  contests.sort((a, b) => {
+    return a.hrs > b.hrs;
+  });
   return contests;
 }
 
