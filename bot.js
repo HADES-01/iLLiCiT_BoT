@@ -37,7 +37,7 @@ client.on("message", async (message) => {
   let command = client.commands.get(commandName);
   try {
     if (command.args && !args.length) {
-      message.reply(`You didn't provide any arguments`);
+      message.reply(`, I can't work like this.`);
       return;
     }
     command.execute(message, args);
@@ -45,6 +45,20 @@ client.on("message", async (message) => {
     console.error(error);
     message.reply("there was an error trying to execute that command!");
   }
+});
+
+const webhookClient = new Discord.WebhookClient(
+  config.webhookID,
+  config.webhookTOKEN
+);
+
+client.on("contestUpdate", (dat) => {
+  const exampleEmbed = { title: `${dat.name}` };
+  webhookClient.send("", {
+    username: client.user.username,
+    avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
+    embeds: [exampleEmbed],
+  });
 });
 
 app.listen(3000, function () {
