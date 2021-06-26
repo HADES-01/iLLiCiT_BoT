@@ -27,7 +27,7 @@ client.login(process.env.TOKEN);
 client.on("message", async (message) => {
   let mentioned = message.mentions.users.first();
   if (mentioned && mentioned.username === client.user.username) {
-    message.channel.send("Here and Running !!");
+    message.reply("Thanks for checking in. 😇 😇");
     return;
   }
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
@@ -36,6 +36,10 @@ client.on("message", async (message) => {
   if (!client.commands.has(commandName)) return;
   let command = client.commands.get(commandName);
   try {
+    if (command.args && !args.length) {
+      message.reply(`You didn't provide any arguments`);
+      return;
+    }
     command.execute(message, args);
   } catch (error) {
     console.error(error);

@@ -1,6 +1,7 @@
 let name = "ping";
 let description = "Ping!";
-function execute(message, args) {
+let args = false;
+function execute(message) {
   message.channel.send("Pong.");
 }
-export { name, description, execute };
+export { name, args, description, execute };
