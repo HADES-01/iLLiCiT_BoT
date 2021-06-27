@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import Discord from "discord.js";
 import config from "./config.js";
 import fs from "fs";
+import getData from "./contestData.js";
 
 dotenv.config();
 let app = express();
@@ -20,15 +21,16 @@ for (const file of commFiles) {
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  setInterval(() => {
-    client.emit("contestUpdate", { name: "One Hour Up" });
+  setInterval(async () => {
+    let data = await getData();
+    client.emit("contestUpdate", data);
   }, 3600000);
 });
 
 client.login(process.env.TOKEN);
 
 client.on("contestUpdate", (dat) => {
-  const exampleEmbed = { title: `${dat.name}` };
+  const exampleEmbed = { title: `${dat[0].name}` };
   webhookClient.send("", {
     username: client.user.username,
     avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
@@ -52,7 +54,7 @@ client.on("message", async (message) => {
   let command = client.commands.get(commandName);
   try {
     if (command.args && !args.length) {
-      message.reply(`, I can't work like this.`);
+      message.reply(`I can't work like this.\n Give me some Args`);
       return;
     }
     command.execute(message, args);
