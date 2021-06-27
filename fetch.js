@@ -1,12 +1,15 @@
 import axios from "axios";
 import config from "./config.js";
+import storage from "node-persist";
 import { createContestObject, websites } from "./utils.js";
 
-let dataPool;
+await storage.init({ dir: ".node-persist/storage" });
+
+let dataPool = await storage.getItem("dataPool");
 
 async function seed() {
   let { data } = await axios.get(config.url);
-  dataPool = data;
+  await storage.setItem("dataPool", data);
   console.log("fetch Successful");
 }
 
@@ -26,6 +29,7 @@ async function everyHour() {
       dataPool.push(ele);
     }
   });
+  await storage.setItem("dataPool", dataPool);
   return ret;
 }
 
@@ -78,8 +82,4 @@ function getAll() {
   return contests;
 }
 
-// await seed();
-// console.log(getByWebsite("fuck"));
-// console.log(getRunning());
-
-export { seed, everyHour, getIn24Hrs, getRunning, getAll };
+export { seed, everyHour, getIn24Hrs, getRunning, getAll, getByWebsite };

@@ -1,17 +1,32 @@
+import { getIn24Hrs, getRunning, getAll, getByWebsite } from "../fetch.js";
+
 const name = "contests",
   description = "Get Contests Info",
   args = false;
 
 async function execute(message, args) {
   let client = message.client;
-
-  dat.forEach((ele) => {
-    if (ele.hrs >= 0) {
+  if (!args.length) {
+    let data = getAll();
+    data.forEach((ele) => {
       message.channel.send(
-        `Starts in ${ele.hrs}hours and ${ele.min}minutes\nVisit here for more:: ${ele.url}`
+        `Starts in ${ele.hrs_until}hours and ${ele.min_until}minutes\nVisit here for more:: ${ele.url}`
       );
+    });
+  } else if (args.length > 1) {
+    message.channel.send("Too many arguments");
+  } else {
+    if (args[0].toLowerCase() === "running") {
+      let data = getRunning();
+      data.forEach((ele) => {
+        message.channel.send(
+          `Starts in ${ele.hrs_until}hours and ${ele.min_until}minutes\nVisit here for more:: ${ele.url}`
+        );
+      });
+    } else {
+      message.channel.send("Provide valid arguments");
     }
-  });
+  }
 }
 
 export { name, description, args, execute };

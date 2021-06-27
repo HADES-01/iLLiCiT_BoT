@@ -7,7 +7,7 @@ import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
 
 dotenv.config();
-storage.init();
+storage.init({ dir: ".node-persist/storage" });
 let app = express();
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -25,7 +25,6 @@ client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
   process.env.HOME = "Hellliooo";
   await seed();
-  storage.setItem("something", ["A", "b"]);
   setInterval(async () => {
     let temp = await everyHour();
     client.emit("contestUpdate", temp);
