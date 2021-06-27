@@ -2,10 +2,12 @@ import express from "express";
 import dotenv from "dotenv";
 import Discord from "discord.js";
 import config from "./config.js";
+import storage from "node-persist";
 import fs from "fs";
-import getData from "./contestData.js";
+import { everyHour, seed } from "./fetch.js";
 
 dotenv.config();
+storage.init();
 let app = express();
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
@@ -19,17 +21,21 @@ for (const file of commFiles) {
   client.commands.set(command.name, command);
 }
 
-client.on("ready", () => {
+client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  process.env.HOME = "Hellliooo";
+  await seed();
+  storage.setItem("something", ["A", "b"]);
   setInterval(async () => {
-    let data = await getData();
-    client.emit("contestUpdate", data);
+    let temp = await everyHour();
+    client.emit("contestUpdate", temp);
   }, 3600000);
 });
 
 client.login(process.env.TOKEN);
 
 client.on("contestUpdate", (dat) => {
+  if (!dat.length) return;
   const exampleEmbed = { title: `${dat[0].name}` };
   webhookClient.send("", {
     username: client.user.username,

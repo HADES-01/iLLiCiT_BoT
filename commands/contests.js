@@ -1,11 +1,8 @@
-import getData from "../contestData.js";
-
 const name = "contests",
   description = "Get Contests Info",
   args = false;
 
 async function execute(message, args) {
-  let dat = await getData();
   let client = message.client;
 
   dat.forEach((ele) => {

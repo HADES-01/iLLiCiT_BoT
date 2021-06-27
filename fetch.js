@@ -7,6 +7,7 @@ let dataPool;
 async function seed() {
   let { data } = await axios.get(config.url);
   dataPool = data;
+  console.log("fetch Successful");
 }
 
 async function everyHour() {
@@ -18,14 +19,13 @@ async function everyHour() {
   }
   data.forEach((ele) => {
     let found = dataPool.find((dat) => {
-      return dat.name === ele.name;
+      return dat.name === ele.name || dat.in_24_hours === "Yes";
     });
     if (!found) {
       ret.push(ele);
       dataPool.push(ele);
     }
   });
-  console.log(ret.length, dataPool.length);
   return ret;
 }
 
@@ -69,8 +69,17 @@ function getByWebsite(name) {
   return contests;
 }
 
-await seed();
-console.log(getByWebsite("fuck"));
+function getAll() {
+  let contests = [];
+  dataPool.forEach((ele) => {
+    let contest = createContestObject(ele);
+    contests.push(contest);
+  });
+  return contests;
+}
+
+// await seed();
+// console.log(getByWebsite("fuck"));
 // console.log(getRunning());
 
-export { seed, everyHour, getIn24Hrs, getRunning };
+export { seed, everyHour, getIn24Hrs, getRunning, getAll };
