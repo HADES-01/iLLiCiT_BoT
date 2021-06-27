@@ -20,9 +20,21 @@ for (const file of commFiles) {
 
 client.on("ready", () => {
   console.log(`Logged in as ${client.user.tag}!`);
+  setInterval(() => {
+    client.emit("contestUpdate", { name: "One Hour Up" });
+  }, 3600000);
 });
 
 client.login(process.env.TOKEN);
+
+client.on("contestUpdate", (dat) => {
+  const exampleEmbed = { title: `${dat.name}` };
+  webhookClient.send("", {
+    username: client.user.username,
+    avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
+    embeds: [exampleEmbed],
+  });
+});
 
 client.on("message", async (message) => {
   let mentioned = message.mentions.users.first();
@@ -33,6 +45,9 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   let args = message.content.slice(1).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
+  if (commandName === "prune") {
+    message.channel.bulkDelete(100, true);
+  }
   if (!client.commands.has(commandName)) return;
   let command = client.commands.get(commandName);
   try {
@@ -51,15 +66,6 @@ const webhookClient = new Discord.WebhookClient(
   config.webhookID,
   config.webhookTOKEN
 );
-
-client.on("contestUpdate", (dat) => {
-  const exampleEmbed = { title: `${dat.name}` };
-  webhookClient.send("", {
-    username: client.user.username,
-    avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
-    embeds: [exampleEmbed],
-  });
-});
 
 app.listen(3000, function () {
   console.log("App is Started at Port 3000");

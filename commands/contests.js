@@ -1,6 +1,4 @@
 import getData from "../contestData.js";
-import Discord from "discord.js";
-import config from "../config.js";
 
 const name = "contests",
   description = "Get Contests Info",
@@ -19,4 +17,4 @@ async function execute(message, args) {
   });
 }
 
-export { name, description, execute };
+export { name, description, args, execute };
