@@ -29,7 +29,7 @@ const help = {
           error
         );
         message.reply(
-          "it seems like I can't DM you! Do you have DMs disabled?"
+          "It seems like I can't DM you! Do you have DMs disabled?"
         );
       });
   },
@@ -37,8 +37,11 @@ const help = {
 
 function helpCommand(name, commands) {
   let resp = "";
-  resp += `\`${name}\` command`;
-  resp += `\n*Usage* ${commands.find((comm) => comm.name === name).usage}`;
+  let found = commands.find((comm) => comm.name === name);
+  if (found) {
+    resp += `\`${name}\` command`;
+    resp += `\n*Usage* ${found.usage}`;
+  } else resp += `\`${name}\` is not one of my commands.`;
   return resp;
 }
 

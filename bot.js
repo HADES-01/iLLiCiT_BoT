@@ -1,7 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import Discord from "discord.js";
-import config from "./config.js";
+import config, { prefix } from "./config.js";
 import storage from "node-persist";
 import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
@@ -23,7 +23,7 @@ for (const file of commFiles) {
 
 client.on("ready", async () => {
   console.log(`Logged in as ${client.user.tag}!`);
-  process.env.HOME = "Hellliooo";
+  await storage.setItem("config", config);
   await seed();
   setInterval(async () => {
     let temp = await everyHour();
@@ -52,7 +52,13 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   let args = message.content.slice(1).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
-  if (!client.commands.has(commandName)) return;
+  if (!client.commands.has(commandName)) {
+    message.reply(
+      `\`${commandName}\` is not one of my commands. Try Listing all Commands using \`${prefix}help\``
+    );
+    return;
+    1;
+  }
   let command = client.commands.get(commandName);
   try {
     if (command.args && !args.length) {

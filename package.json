@@ -5,7 +5,8 @@
   "main": "bot.js",
   "type": "module",
   "scripts": {
-    "test": "node bot.js",
+    "start": "node .",
+    "lint": "eslint .",
     "dev": "nodemon bot.js"
   },
   "keywords": [

@@ -1,10 +1,28 @@
+import { config } from "dotenv";
+import storage from "node-persist";
+storage.init({ dir: ".node-persist/storage" });
 const exp = {
   name: "prune",
   description: "Remove certain no. of messages",
-  args: true,
-  execute(message, args) {
-    let amount = parseInt(args[0]);
-    message.channel.bulkDelete(amount, true);
+  args: false,
+  async execute(message, args) {
+    let config = await storage.getItem("config");
+    let amount = args.length ? parseInt(args[0]) : config.pruneMessages;
+    let deleteEmbed = {
+      color: config.color,
+      title: `**Deleted ${amount} messages.**`,
+      fields: [
+        {
+          name: "Comding",
+          value: "https://cog-creators.github.io/discord-embed-sandbox/",
+        },
+      ],
+    };
+    message.channel.bulkDelete(amount + 1).then(() => {
+      message.channel
+        .send({ embed: deleteEmbed })
+        .then((msg) => msg.delete({ timeout: 3000 }));
+    });
   },
 };
 
