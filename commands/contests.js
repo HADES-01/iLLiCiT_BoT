@@ -14,7 +14,17 @@ async function execute(message, args) {
       );
     });
   } else if (args.length > 1) {
-    message.channel.send("Too many arguments");
+    if (args[0] === "website") {
+      let web = args[1];
+      let data = getByWebsite(web);
+      data.forEach((ele) => {
+        message.channel.send(
+          `**${ele.name}**\nStarts in ${ele.hrs_until}hours and ${ele.min_until}minutes\nVisit here for more:: ${ele.url}`
+        );
+      });
+    } else {
+      message.channel.send("Too many arguments");
+    }
   } else {
     if (args[0].toLowerCase() === "running") {
       let data = getRunning();

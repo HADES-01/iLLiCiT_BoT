@@ -77,7 +77,7 @@ function getAll() {
   let contests = [];
   dataPool.forEach((ele) => {
     let contest = createContestObject(ele);
-    contests.push(contest);
+    if (contest.hrs_until > 0) contests.push(contest);
   });
   return contests;
 }

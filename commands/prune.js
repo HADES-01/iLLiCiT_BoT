@@ -3,8 +3,8 @@ const exp = {
   description: "Remove certain no. of messages",
   args: true,
   execute(message, args) {
-    let mess = parseInt(args[0]);
-    message.channel.bulkDelete(mess, true);
+    let amount = parseInt(args[0]);
+    message.channel.bulkDelete(amount, true);
   },
 };
 

@@ -52,9 +52,6 @@ client.on("message", async (message) => {
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
   let args = message.content.slice(1).trim().split(/ +/);
   const commandName = args.shift().toLowerCase();
-  if (commandName === "prune") {
-    message.channel.bulkDelete(100, true);
-  }
   if (!client.commands.has(commandName)) return;
   let command = client.commands.get(commandName);
   try {
