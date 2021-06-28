@@ -48,7 +48,6 @@ function getIn24Hrs() {
 }
 
 function getRunning() {
-  let curr = new Date();
   let contests = [];
   dataPool.forEach((ele) => {
     if (ele.status === "CODING") {

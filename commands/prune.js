@@ -11,12 +11,6 @@ const exp = {
     let deleteEmbed = {
       color: config.color,
       title: `**Deleted ${amount} messages.**`,
-      fields: [
-        {
-          name: "Comding",
-          value: "https://cog-creators.github.io/discord-embed-sandbox/",
-        },
-      ],
     };
     message.channel.bulkDelete(amount + 1).then(() => {
       message.channel
