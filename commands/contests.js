@@ -7,7 +7,9 @@ const name = "contests",
   args = false;
 
 async function execute(message, args) {
-  let config = await storage.getItem("config");
+  let config = await storage.getItem("config").catch((err) => {
+    console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
+  });
   let maxMessage = config.maxMessages;
   let contestEmbed = {
     color: config.color,
@@ -25,7 +27,6 @@ async function execute(message, args) {
       }
     });
     message.channel.send({ embed: contestEmbed });
-    console.log(contestEmbed);
   } else if (args.length > 1) {
     if (args[0] === "website") {
       let web = args[1];

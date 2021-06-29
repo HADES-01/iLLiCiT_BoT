@@ -12,6 +12,11 @@ let app = express();
 const client = new Discord.Client();
 client.commands = new Discord.Collection();
 
+const webhookClient = new Discord.WebhookClient(
+  config.webhookID,
+  config.webhookTOKEN
+);
+
 let commFiles = fs
   .readdirSync("./commands")
   .filter((file) => file.endsWith(".js"));
@@ -22,12 +27,27 @@ for (const file of commFiles) {
 }
 
 client.on("ready", async () => {
-  console.log(`Logged in as ${client.user.tag}!`);
-  await storage.setItem("config", config);
-  await seed();
+  console.log(`\x1b[33mLogged in as ${client.user.tag}!\x1b[0m`);
+  try {
+    let configs = await storage.getItem("config");
+    if (!configs) {
+      console.log("\x1b[31m==> Setting Basic Configs\x1b[0m");
+      configs = config;
+      await storage.setItem("config", configs);
+    } else {
+      console.log("\x1b[35m==> Using cached configs\x1b[0m");
+    }
+    await seed();
+  } catch (err) {
+    console.log("\x1b[31m==> Unable to Seed database\x1b[0m");
+  }
   setInterval(async () => {
-    let temp = await everyHour();
-    client.emit("contestUpdate", temp);
+    try {
+      let temp = await everyHour();
+      client.emit("contestUpdate", temp);
+    } catch (err) {
+      console.log("\x1b[31m==> Unable to Update Database\x1b[0m");
+    }
   }, 3600000);
 });
 
@@ -57,7 +77,6 @@ client.on("message", async (message) => {
       `\`${commandName}\` is not one of my commands. Try Listing all Commands using \`${prefix}help\``
     );
     return;
-    1;
   }
   let command = client.commands.get(commandName);
   try {
@@ -71,11 +90,6 @@ client.on("message", async (message) => {
     message.reply("there was an error trying to execute that command!");
   }
 });
-
-const webhookClient = new Discord.WebhookClient(
-  config.webhookID,
-  config.webhookTOKEN
-);
 
 app.listen(3000, function () {
   console.log("App is Started at Port 3000");

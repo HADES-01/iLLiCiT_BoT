@@ -39,7 +39,7 @@ function helpCommand(name, commands) {
   let resp = "";
   let found = commands.find((comm) => comm.name === name);
   if (found) {
-    resp += `\`${name}\` command`;
+    resp += `\`${name}\` command ${found.description}`;
     resp += `\n*Usage* ${found.usage}`;
   } else resp += `\`${name}\` is not one of my commands.`;
   return resp;

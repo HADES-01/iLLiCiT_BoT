@@ -8,28 +8,40 @@ await storage.init({ dir: ".node-persist/storage" });
 let dataPool = await storage.getItem("dataPool");
 
 async function seed() {
-  let { data } = await axios.get(config.url);
-  await storage.setItem("dataPool", data);
-  console.log("fetch Successful");
+  try {
+    if (!dataPool) {
+      let { data } = await axios.get(config.url);
+      await storage.setItem("dataPool", data);
+      console.info("\x1b[36m%s\x1b[0m", "==> Fetch Successful");
+    } else {
+      console.log("\x1b[35m==> Using cached DataPool\x1b[0m");
+    }
+  } catch (err) {
+    console.log("\x1b[31m==> Fetch Unsuccessful\x1b[0m");
+  }
 }
 
 async function everyHour() {
-  let { data } = await axios.get(config.url);
-  let ret = [];
-  if (!dataPool) {
-    dataPool = data;
-    return data;
-  }
-  data.forEach((ele) => {
-    let found = dataPool.find((dat) => {
-      return dat.name === ele.name || dat.in_24_hours === "Yes";
-    });
-    if (!found) {
-      ret.push(ele);
-      dataPool.push(ele);
+  try {
+    let { data } = await axios.get(config.url);
+    let ret = [];
+    if (!dataPool) {
+      dataPool = data;
+      return data;
     }
-  });
-  await storage.setItem("dataPool", dataPool);
+    data.forEach((ele) => {
+      let found = dataPool.find((dat) => {
+        return dat.name === ele.name || dat.in_24_hours === "Yes";
+      });
+      if (!found) {
+        ret.push(ele);
+        dataPool.push(ele);
+      }
+    });
+    await storage.setItem("dataPool", dataPool);
+  } catch (error) {
+    console.log("\x1b[31m==> fetch unsuccessful", error, "\x1b[0m");
+  }
   return ret;
 }
 
@@ -72,6 +84,15 @@ function getByWebsite(name) {
   return contests;
 }
 
+function getInHours(hrs) {
+  let contests = [];
+  dataPool.forEach((ele) => {
+    let contest = createContestObject(ele);
+    if (contests.hrs_until === hrs) contests.push(contest);
+  });
+  return contests;
+}
+
 function getAll() {
   let contests = [];
   dataPool.forEach((ele) => {
@@ -81,4 +102,12 @@ function getAll() {
   return contests;
 }
 
-export { seed, everyHour, getIn24Hrs, getRunning, getAll, getByWebsite };
+export {
+  seed,
+  everyHour,
+  getIn24Hrs,
+  getRunning,
+  getAll,
+  getByWebsite,
+  getInHours,
+};
