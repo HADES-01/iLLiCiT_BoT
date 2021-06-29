@@ -71,9 +71,6 @@ function getRunning() {
 }
 
 function getByWebsite(name) {
-  if (!websites.includes(name)) {
-    return [{ name: "Not Found" }];
-  }
   let contests = [];
   dataPool.forEach((ele) => {
     if (ele.url.includes(name)) {

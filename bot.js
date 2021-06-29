@@ -1,15 +1,19 @@
-import express from "express";
+// import express from "express";
 import dotenv from "dotenv";
 import Discord from "discord.js";
 import config, { prefix } from "./config.js";
 import storage from "node-persist";
 import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
+import disbut from "discord-buttons";
 
-dotenv.config();
-storage.init({ dir: ".node-persist/storage" });
-let app = express();
+// let app = express();
 const client = new Discord.Client();
+disbut(client);
+dotenv.config();
+storage.init({ dir: ".node-persist/storage" }).catch((err) => {
+  console.log("\x1b[31m==> Unable to Setup LocalStorage\x1b[0m");
+});
 client.commands = new Discord.Collection();
 
 const webhookClient = new Discord.WebhookClient(
@@ -22,8 +26,12 @@ let commFiles = fs
   .filter((file) => file.endsWith(".js"));
 
 for (const file of commFiles) {
-  let command = await import(`./commands/${file}`);
-  client.commands.set(command.name, command);
+  try {
+    let command = await import(`./commands/${file}`);
+    client.commands.set(command.name, command);
+  } catch (err) {
+    console.log("\x1b[31m==> Couldn't load files\x1b[0m");
+  }
 }
 
 client.on("ready", async () => {
@@ -31,7 +39,7 @@ client.on("ready", async () => {
   try {
     let configs = await storage.getItem("config");
     if (!configs) {
-      console.log("\x1b[31m==> Setting Basic Configs\x1b[0m");
+      console.log("\x1b[36m==> Setting Basic Configs\x1b[0m");
       configs = config;
       await storage.setItem("config", configs);
     } else {
@@ -51,7 +59,9 @@ client.on("ready", async () => {
   }, 3600000);
 });
 
-client.login(process.env.TOKEN);
+client.on("clickButton", async (button) => {
+  await button.reply.send("My messsage");
+});
 
 client.on("contestUpdate", (dat) => {
   if (!dat.length) return;
@@ -91,6 +101,8 @@ client.on("message", async (message) => {
   }
 });
 
-app.listen(3000, function () {
-  console.log("App is Started at Port 3000");
-});
+client.login(process.env.TOKEN);
+
+// app.listen(3000, function () {
+//   console.log("App is Started at Port 3000");
+// });

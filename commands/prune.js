@@ -1,4 +1,3 @@
-import { config } from "dotenv";
 import storage from "node-persist";
 storage.init({ dir: ".node-persist/storage" });
 const exp = {
@@ -12,11 +11,15 @@ const exp = {
       color: config.color,
       title: `**Deleted ${amount} messages.**`,
     };
-    message.channel.bulkDelete(amount + 1).then(() => {
-      message.channel
-        .send({ embed: deleteEmbed })
-        .then((msg) => msg.delete({ timeout: 3000 }));
-    });
+    try {
+      message.channel.bulkDelete(amount + 1).then(() => {
+        message.channel
+          .send({ embed: deleteEmbed })
+          .then((msg) => msg.delete({ timeout: 3000 }));
+      });
+    } catch (err) {
+      message.reply("I don't have Enough Permissions");
+    }
   },
 };
 
