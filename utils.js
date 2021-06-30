@@ -62,30 +62,43 @@ let websites = [
   "toph",
 ];
 
-let next = new MessageButton()
-  .setID("next_page")
-  .setLabel("Next")
-  .setStyle("grey")
-  .setEmoji("➡");
-let prev = new MessageButton()
-  .setID("next_page")
-  .setLabel("Previous")
-  .setStyle("grey")
-  .setEmoji("⬅");
-let row = new MessageActionRow().addComponent(prev).addComponent(next);
+let next = () => {
+  return new MessageButton()
+    .setID("next_page")
+    .setLabel("Next")
+    .setStyle("grey")
+    .setEmoji("➡");
+};
+let prev = () => {
+  return new MessageButton()
+    .setID("prev_page")
+    .setLabel("Previous")
+    .setStyle("grey")
+    .setEmoji("⬅");
+};
+let newRow = () => {
+  return new MessageActionRow().addComponent(prev()).addComponent(next());
+};
 
 function createContestEmbed(data, contestEmbed, n = 1, maxMessage) {
   contestEmbed.fields = [];
-  for (let i = (n - 1) * maxMessage; i < n * maxMessage; i++) {
+  for (
+    let i = (n - 1) * maxMessage;
+    i < n * maxMessage && i < data.length;
+    i++
+  ) {
     contestEmbed.fields.push({
       name: `${data[i].name}`,
       value: `Starts in ${data[i].hrs_until}hours and ${data[i].min_until}minutes\nVisit [here](${data[i].url}) for more.`,
     });
   }
+  let len = data.length;
   contestEmbed.footer = {
-    text: `${n} of ${Math.floor(data.length / maxMessage)}`,
+    text: `${n} of ${
+      Math.floor(len / maxMessage) + (len % maxMessage === 0 ? 0 : 1)
+    }`,
   };
-  // console.log(contestEmbed);
+  // console.log(data.length);
 }
 
-export { createContestObject, websites, row, createContestEmbed };
+export { createContestObject, websites, newRow, createContestEmbed };

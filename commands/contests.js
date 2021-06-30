@@ -1,5 +1,5 @@
 import { getIn24Hrs, getRunning, getAll, getByWebsite } from "../fetch.js";
-import { websites, row, createContestEmbed } from "../utils.js";
+import { websites, newRow, createContestEmbed } from "../utils.js";
 import storage from "node-persist";
 
 const name = "contests",
@@ -47,14 +47,20 @@ async function messageHandler(data, message) {
     fields: [],
   };
   createContestEmbed(data, contestEmbed, 1, maxMessage);
+  let row = newRow();
+  row.components[0].setDisabled();
+  let len = data.length;
+  let total = Math.floor(len / maxMessage) + (len % maxMessage === 0 ? 0 : 1);
+  total === 1 && (await row.components[1].setDisabled());
   await message.channel
     .send({ embed: contestEmbed, component: row })
     .then((message) => {
       next_prev.set(message.id, {
+        timestamp: new Date().getMilliseconds(),
         data: data,
         start: 1,
         curr: 1,
-        end: Math.floor(data.length / maxMessage),
+        end: total,
       });
     });
 }

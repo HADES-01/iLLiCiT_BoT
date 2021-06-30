@@ -3,10 +3,10 @@ import dotenv from "dotenv";
 import Discord from "discord.js";
 import config, { prefix } from "./config.js";
 import storage from "node-persist";
-import fs from "fs";
+import fs, { read } from "fs";
 import { everyHour, seed } from "./fetch.js";
 import disbut from "discord-buttons";
-import { createContestEmbed } from "./utils.js";
+import { createContestEmbed, newRow } from "./utils.js";
 
 // let app = express();
 const client = new Discord.Client();
@@ -23,6 +23,12 @@ const webhookClient = new Discord.WebhookClient(
   config.webhookTOKEN
 );
 
+client.on("ready", ready);
+client.on("clickButton", clickButton);
+client.on("contestUpdate", contestUpdate);
+client.on("message", onMessage);
+client.login(process.env.TOKEN);
+
 let commFiles = fs
   .readdirSync("./commands")
   .filter((file) => file.endsWith(".js"));
@@ -36,7 +42,7 @@ for (const file of commFiles) {
   }
 }
 
-client.on("ready", async () => {
+async function ready() {
   console.log(`\x1b[33mLogged in as ${client.user.tag}!\x1b[0m`);
   try {
     let configs = await storage.getItem("config");
@@ -59,24 +65,34 @@ client.on("ready", async () => {
       console.log("\x1b[31m==> Unable to Update Database\x1b[0m");
     }
   }, 3600000);
-});
+}
 
-client.on("clickButton", async (button) => {
+async function clickButton(button) {
   let contestEmbed = await button.message.embeds[0];
-  let buttons = await button.message.components[0];
+  delete button.message.component;
+  let buttons = newRow();
   let message_info = await client.next_prev.get(button.message.id);
-  let { data, curr } = message_info;
+  let { data, curr, start, end } = message_info;
   if (button.id === "next_page") {
-    console.log(curr);
     createContestEmbed(data, contestEmbed, curr + 1, config.maxMessages);
     message_info.curr += 1;
     await client.next_prev.set(button.message.id, message_info);
+    if (curr + 1 === end) {
+      buttons.components[1].setDisabled();
+    }
+  } else if (button.id === "prev_page") {
+    createContestEmbed(data, contestEmbed, curr - 1, config.maxMessages);
+    message_info.curr -= 1;
+    await client.next_prev.set(button.message.id, message_info);
+    if (curr - 1 === start) {
+      buttons.components[0].setDisabled();
+    }
   }
   await button.message.edit({ embed: contestEmbed, component: buttons });
   button.defer();
-});
+}
 
-client.on("contestUpdate", (dat) => {
+function contestUpdate(dat) {
   if (!dat.length) return;
   const exampleEmbed = { title: `${dat[0].name}` };
   webhookClient.send("", {
@@ -84,9 +100,9 @@ client.on("contestUpdate", (dat) => {
     avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
     embeds: [exampleEmbed],
   });
-});
+}
 
-client.on("message", async (message) => {
+async function onMessage(message) {
   let mentioned = message.mentions.users.first();
   if (mentioned && mentioned.username === client.user.username) {
     message.reply("Thanks for checking in. 😇 😇");
@@ -112,9 +128,7 @@ client.on("message", async (message) => {
     console.error(error);
     message.reply("there was an error trying to execute that command!");
   }
-});
-
-client.login(process.env.TOKEN);
+}
 
 // app.listen(3000, function () {
 //   console.log("App is Started at Port 3000");
