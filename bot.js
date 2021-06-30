@@ -71,25 +71,35 @@ async function clickButton(button) {
   let contestEmbed = await button.message.embeds[0];
   delete button.message.component;
   let buttons = newRow();
-  let message_info = await client.next_prev.get(button.message.id);
-  let { data, curr, start, end } = message_info;
-  if (button.id === "next_page") {
-    createContestEmbed(data, contestEmbed, curr + 1, config.maxMessages);
-    message_info.curr += 1;
-    await client.next_prev.set(button.message.id, message_info);
-    if (curr + 1 === end) {
-      buttons.components[1].setDisabled();
+  try {
+    let message_info = await client.next_prev.get(button.message.id);
+    let { data, curr, start, end } = message_info;
+    if (button.id === "next_page") {
+      createContestEmbed(data, contestEmbed, curr + 1, config.maxMessages);
+      message_info.curr += 1;
+      await client.next_prev.set(button.message.id, message_info);
+      if (curr + 1 === end) {
+        buttons.components[1].setDisabled();
+      }
+    } else if (button.id === "prev_page") {
+      createContestEmbed(data, contestEmbed, curr - 1, config.maxMessages);
+      message_info.curr -= 1;
+      await client.next_prev.set(button.message.id, message_info);
+      if (curr - 1 === start) {
+        buttons.components[0].setDisabled();
+      }
     }
-  } else if (button.id === "prev_page") {
-    createContestEmbed(data, contestEmbed, curr - 1, config.maxMessages);
-    message_info.curr -= 1;
-    await client.next_prev.set(button.message.id, message_info);
-    if (curr - 1 === start) {
-      buttons.components[0].setDisabled();
-    }
+    await button.message.edit({ embed: contestEmbed, component: buttons });
+    button.defer();
+  } catch (err) {
+    contestEmbed.title = "List is Too Old.";
+    delete contestEmbed.fields;
+    delete contestEmbed.footer;
+    console.log("\x1b[31m==> List not found in Collections\x1b[0m");
+    button.message.edit({ embed: contestEmbed });
+    button.defer();
+    return;
   }
-  await button.message.edit({ embed: contestEmbed, component: buttons });
-  button.defer();
 }
 
 function contestUpdate(dat) {
