@@ -1,7 +1,6 @@
 import { getIn24Hrs, getRunning, getAll, getByWebsite } from "../fetch.js";
-import { websites } from "../utils.js";
+import { websites, row, createContestEmbed } from "../utils.js";
 import storage from "node-persist";
-import { MessageButton, MessageActionRow } from "discord-buttons";
 
 const name = "contests",
   description = "Get Contests Info",
@@ -16,26 +15,9 @@ try {
 let maxMessage = config.maxMessages;
 
 async function execute(message, args) {
-  let contestEmbed = {
-    color: config.color,
-    title: "Contests List.",
-    fields: [],
-  };
-  let next = new MessageButton()
-    .setID("next_page")
-    .setLabel("Next")
-    .setStyle("grey")
-    .setEmoji("➡");
-  let prev = new MessageButton()
-    .setID("next_page")
-    .setLabel("Previous")
-    .setStyle("grey")
-    .setEmoji("⬅");
-  let row = new MessageActionRow().addComponent(prev).addComponent(next);
   if (!args.length) {
     let data = getAll();
-    allData(data, contestEmbed);
-    message.channel.send({ embed: contestEmbed, component: row });
+    messageHandler(data, message);
   } else {
     args = args.map((ele) => ele.toLowerCase());
     if (args[0] === "website") {
@@ -49,25 +31,32 @@ async function execute(message, args) {
         return;
       }
       let data = getByWebsite(web);
-      allData(data, contestEmbed);
-      message.channel.send({ embed: contestEmbed, component: row });
+      messageHandler(data, message);
     } else if (args[0].toLowerCase() === "running") {
       let data = getRunning();
-      allData(data, contestEmbed);
-      message.channel.send({ embed: contestEmbed, component: row });
+      messageHandler(data, message);
     } else message.reply("Wrong Usage. Try using `~help contests` for usage.");
   }
 }
 
-function allData(data, contestEmbed) {
-  data.forEach((ele, idx) => {
-    if (idx < maxMessage) {
-      contestEmbed.fields.push({
-        name: `${ele.name}`,
-        value: `Starts in ${ele.hrs_until}hours and ${ele.min_until}minutes\nVisit [here](${ele.url}) for more.`,
+async function messageHandler(data, message) {
+  let next_prev = message.client.next_prev;
+  let contestEmbed = {
+    color: config.color,
+    title: "Contests List.",
+    fields: [],
+  };
+  createContestEmbed(data, contestEmbed, 1, maxMessage);
+  await message.channel
+    .send({ embed: contestEmbed, component: row })
+    .then((message) => {
+      next_prev.set(message.id, {
+        data: data,
+        start: 1,
+        curr: 1,
+        end: Math.floor(data.length / maxMessage),
       });
-    }
-  });
+    });
 }
 
 export { name, description, args, execute };

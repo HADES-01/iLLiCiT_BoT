@@ -1,3 +1,5 @@
+import { MessageButton, MessageActionRow } from "discord-buttons";
+
 let months = [
   "Jan",
   "Feb",
@@ -60,4 +62,30 @@ let websites = [
   "toph",
 ];
 
-export { createContestObject, websites };
+let next = new MessageButton()
+  .setID("next_page")
+  .setLabel("Next")
+  .setStyle("grey")
+  .setEmoji("➡");
+let prev = new MessageButton()
+  .setID("next_page")
+  .setLabel("Previous")
+  .setStyle("grey")
+  .setEmoji("⬅");
+let row = new MessageActionRow().addComponent(prev).addComponent(next);
+
+function createContestEmbed(data, contestEmbed, n = 1, maxMessage) {
+  contestEmbed.fields = [];
+  for (let i = (n - 1) * maxMessage; i < n * maxMessage; i++) {
+    contestEmbed.fields.push({
+      name: `${data[i].name}`,
+      value: `Starts in ${data[i].hrs_until}hours and ${data[i].min_until}minutes\nVisit [here](${data[i].url}) for more.`,
+    });
+  }
+  contestEmbed.footer = {
+    text: `${n} of ${Math.floor(data.length / maxMessage)}`,
+  };
+  // console.log(contestEmbed);
+}
+
+export { createContestObject, websites, row, createContestEmbed };

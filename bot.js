@@ -6,6 +6,7 @@ import storage from "node-persist";
 import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
 import disbut from "discord-buttons";
+import { createContestEmbed } from "./utils.js";
 
 // let app = express();
 const client = new Discord.Client();
@@ -15,6 +16,7 @@ storage.init({ dir: ".node-persist/storage" }).catch((err) => {
   console.log("\x1b[31m==> Unable to Setup LocalStorage\x1b[0m");
 });
 client.commands = new Discord.Collection();
+client.next_prev = new Discord.Collection();
 
 const webhookClient = new Discord.WebhookClient(
   config.webhookID,
@@ -60,7 +62,18 @@ client.on("ready", async () => {
 });
 
 client.on("clickButton", async (button) => {
-  await button.reply.send("My messsage");
+  let contestEmbed = await button.message.embeds[0];
+  let buttons = await button.message.components[0];
+  let message_info = await client.next_prev.get(button.message.id);
+  let { data, curr } = message_info;
+  if (button.id === "next_page") {
+    console.log(curr);
+    createContestEmbed(data, contestEmbed, curr + 1, config.maxMessages);
+    message_info.curr += 1;
+    await client.next_prev.set(button.message.id, message_info);
+  }
+  await button.message.edit({ embed: contestEmbed, component: buttons });
+  button.defer();
 });
 
 client.on("contestUpdate", (dat) => {
