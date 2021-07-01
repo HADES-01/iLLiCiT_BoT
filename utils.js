@@ -119,11 +119,17 @@ function createContestEmbed(data, contestEmbed, n = 1, maxMessage) {
     });
   }
   let len = data.length;
-  contestEmbed.footer = {
-    text: `${n} of ${
-      Math.floor(len / maxMessage) + (len % maxMessage === 0 ? 0 : 1)
-    }`,
-  };
+  if (len > 0) {
+    contestEmbed.footer = {
+      text: `${n} of ${
+        Math.floor(len / maxMessage) + (len % maxMessage === 0 ? 0 : 1)
+      }`,
+    };
+  } else {
+    contestEmbed.footer = {
+      text: "No such contests.",
+    };
+  }
   // console.log(data.length);
 }
 

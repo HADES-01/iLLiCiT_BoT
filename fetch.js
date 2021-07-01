@@ -12,6 +12,7 @@ async function seed() {
     if (!dataPool) {
       let { data } = await axios.get(config.url);
       await storage.setItem("dataPool", data);
+      dataPool = data;
       console.info("\x1b[36m%s\x1b[0m", "==> Fetch Successful");
     } else {
       console.log("\x1b[35m==> Using cached DataPool\x1b[0m");
@@ -45,20 +46,6 @@ async function everyHour() {
   return ret;
 }
 
-function getIn24Hrs() {
-  let contests = [];
-  dataPool.forEach((ele) => {
-    if (ele.in_24_hours === "Yes") {
-      let contest = createContestObject(ele);
-      if (contest.hrs > 0) contests.push(contest);
-    }
-  });
-  contests.sort((a, b) => {
-    return a.hrs > b.hrs;
-  });
-  return contests;
-}
-
 function getRunning() {
   let contests = [];
   dataPool.forEach((ele) => {
@@ -85,7 +72,7 @@ function getInHours(hrs) {
   let contests = [];
   dataPool.forEach((ele) => {
     let contest = createContestObject(ele);
-    if (contests.hrs_until === hrs) contests.push(contest);
+    if (contest.hrs_until === hrs) contests.push(contest);
   });
   return contests;
 }
@@ -99,12 +86,4 @@ function getAll() {
   return contests;
 }
 
-export {
-  seed,
-  everyHour,
-  getIn24Hrs,
-  getRunning,
-  getAll,
-  getByWebsite,
-  getInHours,
-};
+export { seed, everyHour, getRunning, getAll, getByWebsite, getInHours };
