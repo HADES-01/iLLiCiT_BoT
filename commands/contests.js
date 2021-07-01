@@ -6,6 +6,7 @@ import storage from "node-persist";
 const name = "contests",
   description = "Get Contests Info",
   args = false;
+
 let config;
 try {
   storage.init({ dir: ".node-persist/storage" });
@@ -14,7 +15,6 @@ try {
   console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
 }
 let maxMessage = config.maxMessages;
-
 async function execute(message, args) {
   if (!args.length) {
     let data = getAll();
@@ -32,11 +32,7 @@ async function execute(message, args) {
         return;
       }
       let data = getByWebsite(web);
-      messageHandler(
-        data,
-        message,
-        `All Contests From ${type.website.toUpperCase()}`
-      );
+      messageHandler(data, message, `All Contests From ${web.toUpperCase()}`);
     } else if (args[0] === "running") {
       let data = getRunning();
       messageHandler(data, message, "All Running Contests");

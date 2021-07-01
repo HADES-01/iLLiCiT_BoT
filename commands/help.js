@@ -18,7 +18,7 @@ const help = {
       args.map((arg) => data.push(helpCommand(arg, commands)));
     }
     return message.author
-      .send(data, { split: true })
+      .send(data.join(""), { split: true })
       .then(() => {
         if (message.channel.type === "dm") return;
         message.reply("I've sent you a DM with all my commands!");
