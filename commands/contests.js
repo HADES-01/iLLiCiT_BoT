@@ -56,7 +56,6 @@ async function messageHandler(data, message, type) {
     title: embedTitle,
     fields: [],
   };
-  data.length;
   createContestEmbed(data, contestEmbed, 1, maxMessage);
   let row = newRow();
   row.components[0].setDisabled();

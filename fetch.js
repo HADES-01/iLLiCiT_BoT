@@ -86,4 +86,22 @@ function getAll() {
   return contests;
 }
 
-export { seed, everyHour, getRunning, getAll, getByWebsite, getInHours };
+function getByName(name) {
+  let contests = [];
+  dataPool.map((data) => {
+    if (data.name === name) {
+      contests.push(data);
+    }
+  });
+  return contests;
+}
+
+export {
+  seed,
+  everyHour,
+  getRunning,
+  getAll,
+  getByWebsite,
+  getInHours,
+  getByName,
+};
