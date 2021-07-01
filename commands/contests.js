@@ -17,7 +17,7 @@ let maxMessage = config.maxMessages;
 async function execute(message, args) {
   if (!args.length) {
     let data = getAll();
-    messageHandler(data, message);
+    messageHandler(data, message, { id: 1 });
   } else {
     args = args.map((ele) => ele.toLowerCase());
     if (args[0] === "website") {
@@ -31,19 +31,31 @@ async function execute(message, args) {
         return;
       }
       let data = getByWebsite(web);
-      messageHandler(data, message);
+      messageHandler(data, message, { id: 3, website: web });
     } else if (args[0].toLowerCase() === "running") {
       let data = getRunning();
-      messageHandler(data, message);
+      messageHandler(data, message, { id: 2 });
     } else message.reply("Wrong Usage. Try using `~help contests` for usage.");
   }
 }
 
-async function messageHandler(data, message) {
+async function messageHandler(data, message, type) {
+  let embedTitle;
+  switch (type.id) {
+    case 1:
+      embedTitle = "All contests";
+      break;
+    case 2:
+      embedTitle = "All Running Contests";
+      break;
+    case 3:
+      embedTitle = `All Contests From ${type.website.toUpperCase()}`;
+      break;
+  }
   let next_prev = message.client.next_prev;
   let contestEmbed = {
     color: config.color,
-    title: "Contests List.",
+    title: embedTitle,
     fields: [],
   };
   createContestEmbed(data, contestEmbed, 1, maxMessage);

@@ -115,7 +115,9 @@ function contestUpdate(dat) {
 async function onMessage(message) {
   let mentioned = message.mentions.users.first();
   if (mentioned && mentioned.username === client.user.username) {
-    message.reply("Thanks for checking in. 😇 😇");
+    message.reply(
+      `Thanks for checking in. 😇 😇\nGet my commands by \`${prefix}help\``
+    );
     return;
   }
   if (!message.content.startsWith(config.prefix) || message.author.bot) return;
