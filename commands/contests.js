@@ -1,5 +1,6 @@
 import { getInHours, getRunning, getAll, getByWebsite } from "../fetch.js";
 import { websites, newRow, createContestEmbed } from "../utils.js";
+import configs from "../config.js";
 import storage from "node-persist";
 
 const name = "contests",
@@ -8,7 +9,7 @@ const name = "contests",
 let config;
 try {
   storage.init({ dir: ".node-persist/storage" });
-  config = await storage.getItem("config");
+  config = (await storage.getItem("config")) || configs;
 } catch (error) {
   console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
 }

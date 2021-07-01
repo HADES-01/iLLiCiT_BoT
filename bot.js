@@ -17,12 +17,6 @@ storage.init({ dir: ".node-persist/storage" }).catch((err) => {
 });
 client.commands = new Discord.Collection();
 client.next_prev = new Discord.Collection();
-
-const webhookClient = new Discord.WebhookClient(
-  config.webhookID,
-  config.webhookTOKEN
-);
-
 client.on("ready", ready);
 client.on("clickButton", clickButton);
 client.on("contestUpdate", contestUpdate);
@@ -38,7 +32,16 @@ for (const file of commFiles) {
     let command = await import(`./commands/${file}`);
     client.commands.set(command.name, command);
   } catch (err) {
-    console.log("\x1b[31m==> Couldn't load files\x1b[0m");
+    console.log("\x1b[31m==> Couldn't load files\x1b[0m", err);
+  }
+}
+
+async function handleEveryHour() {
+  try {
+    let temp = await everyHour();
+    client.emit("contestUpdate", temp);
+  } catch (err) {
+    console.log("\x1b[31m==> Unable to Update Database\x1b[0m", err);
   }
 }
 
@@ -57,14 +60,8 @@ async function ready() {
   } catch (err) {
     console.log("\x1b[31m==> Unable to Seed database\x1b[0m");
   }
-  setInterval(async () => {
-    try {
-      let temp = await everyHour();
-      client.emit("contestUpdate", temp);
-    } catch (err) {
-      console.log("\x1b[31m==> Unable to Update Database\x1b[0m");
-    }
-  }, 3600000);
+  await handleEveryHour();
+  setInterval(handleEveryHour, 900000);
 }
 
 async function clickButton(button) {
@@ -103,12 +100,17 @@ async function clickButton(button) {
 }
 
 function contestUpdate(dat) {
-  if (!dat.length) return;
-  const exampleEmbed = { title: `${dat[0].name}` };
-  webhookClient.send("", {
-    username: client.user.username,
-    avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
-    embeds: [exampleEmbed],
+  config.webhooks.forEach((hook) => {
+    const webhookClient = new Discord.WebhookClient(hook.ID, hook.TOKEN);
+    if (!dat.length) return;
+    dat.forEach((ele) => {
+      const exampleEmbed = { color: config.color, title: `${ele.name}` };
+      webhookClient.send("", {
+        username: client.user.username,
+        avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
+        embeds: [exampleEmbed],
+      });
+    });
   });
 }
 

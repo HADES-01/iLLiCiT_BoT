@@ -40,10 +40,10 @@ async function everyHour() {
       }
     });
     await storage.setItem("dataPool", dataPool);
+    return ret;
   } catch (error) {
     console.log("\x1b[31m==> fetch unsuccessful", error, "\x1b[0m");
   }
-  return ret;
 }
 
 function getRunning() {
