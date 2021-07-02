@@ -65,7 +65,7 @@ let websites = [
     name: "codechef",
     description:
       "Here is where you can show off your computer programming skills.\n Take part in our 10 days long monthly coding contest and the shorter format Cook-off and Lunchtime coding contests.\n Put yourself up for recognition and win great prizes.",
-    url: "https://miro.medium.com/max/333/1*1W0-bbmt4iiEpp_pPrS0VQ.png",
+    url: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7b/Codechef%28new%29_logo.svg/1200px-Codechef%28new%29_logo.svg.png",
   },
   {
     name: "codeforces",

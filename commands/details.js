@@ -16,7 +16,11 @@ async function execute(message, args) {
     console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
   }
   let name = args.join(" ");
-  let data = createContestObject(getByName(name)[0]);
+  let temp = getByName(name)[0];
+  if (!temp) {
+    return message.reply("Couldn't find what u're looking for.");
+  }
+  let data = createContestObject(temp);
   let website = hasWebsite(data.website.split(" ").join(""));
   let contestEmbed = {
     color: config.color,

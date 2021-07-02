@@ -1,7 +1,7 @@
 import axios from "axios";
 import config from "./config.js";
 import storage from "node-persist";
-import { createContestObject, websites } from "./utils.js";
+import { createContestObject } from "./utils.js";
 
 await storage.init({ dir: ".node-persist/storage" });
 
@@ -59,7 +59,10 @@ function getRunning() {
 function getByWebsite(name) {
   let contests = [];
   dataPool.forEach((ele) => {
-    if (ele.site.toLowerCase().split(" ").join("") === name || ele.url.includes(name)) {
+    if (
+      ele.site.toLowerCase().split(" ").join("") === name ||
+      ele.url.includes(name)
+    ) {
       let contest = createContestObject(ele);
       contests.push(contest);
     }
@@ -88,7 +91,7 @@ function getAll() {
 function getByName(name) {
   let contests = [];
   dataPool.forEach((data) => {
-    if (data.name === name) {
+    if (data.name.toLowerCase().includes(name.toLowerCase())) {
       contests.push(data);
     }
   });
