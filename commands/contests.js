@@ -1,23 +1,29 @@
 import { getInHours, getRunning, getAll, getByWebsite } from "../fetch.js";
-import { websites, newRow, createContestEmbed } from "../utils.js";
+import { websites, newRow, createContestEmbed, hasWebsite } from "../utils.js";
 import configs from "../config.js";
 import storage from "node-persist";
 
-const name = "contests",
+let name = "contests",
   description_short = "Get Contests Info",
-  description_long = "Get Contests Info",
+  description_long =
+    "Display info on various running or upcoming contests.\nUse one of the sub commands to filter the results.\nSub-commands are:\n",
   usage = "contests <sub command>",
   args = false;
 
+description_long +=
+  "*running*\t Retirieves all the currently running contests.\n";
+description_long +=
+  "*website <name>*\t Filters all results based on the website name.\n";
+description_long +=
+  "*hrs <amount>*\t Filters all results based on the no of hrs it will start in.\n";
 let config;
-try {
-  storage.init({ dir: ".node-persist/storage" });
-  config = (await storage.getItem("config")) || configs;
-} catch (error) {
-  console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
-}
-let maxMessage = config.maxMessages;
 async function execute(message, args) {
+  try {
+    storage.init({ dir: ".node-persist/storage" });
+    config = (await storage.getItem("config")) || configs;
+  } catch (error) {
+    console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
+  }
   if (!args.length) {
     let data = getAll();
     messageHandler(data, message, "All contests");
@@ -29,11 +35,11 @@ async function execute(message, args) {
         message.reply("Please provide the website name as well.");
         return;
       }
-      if (!websites.includes(web)) {
+      let data = getByWebsite(web);
+      if (!data.length) {
         message.reply(`Sorry I don't have the data for \`${web}\`.`);
         return;
       }
-      let data = getByWebsite(web);
       messageHandler(data, message, `All Contests From ${web.toUpperCase()}`);
     } else if (args[0] === "running") {
       let data = getRunning();
@@ -47,6 +53,7 @@ async function execute(message, args) {
 }
 
 async function messageHandler(data, message, type) {
+  let maxMessage = config.maxMessages;
   let embedTitle = type;
   let next_prev = message.client.next_prev;
   let contestEmbed = {

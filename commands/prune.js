@@ -9,6 +9,9 @@ const exp = {
   async execute(message, args) {
     let config = await storage.getItem("config");
     let amount = args.length ? parseInt(args[0]) : config.pruneMessages;
+    if (amount < 0 || amount > 99) {
+      return message.reply("I can only delete 0-99 messages");
+    }
     let deleteEmbed = {
       color: config.color,
       title: `**Deleted ${amount} messages.**`,

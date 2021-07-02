@@ -1,4 +1,5 @@
-import { prefix } from "../config.js";
+import configs, { prefix } from "../config.js";
+import storage from "node-persist";
 
 const help = {
   name: "help",

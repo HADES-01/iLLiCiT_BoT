@@ -36,10 +36,9 @@ async function everyHour() {
       });
       if (!found) {
         ret.push(ele);
-        dataPool.push(ele);
       }
     });
-    await storage.setItem("dataPool", dataPool);
+    await storage.setItem("dataPool", data);
     return ret;
   } catch (error) {
     console.log("\x1b[31m==> fetch unsuccessful", error, "\x1b[0m");
@@ -60,7 +59,7 @@ function getRunning() {
 function getByWebsite(name) {
   let contests = [];
   dataPool.forEach((ele) => {
-    if (ele.url.includes(name)) {
+    if (ele.site.toLowerCase().split(" ").join("") === name || ele.url.includes(name)) {
       let contest = createContestObject(ele);
       contests.push(contest);
     }
@@ -88,7 +87,7 @@ function getAll() {
 
 function getByName(name) {
   let contests = [];
-  dataPool.map((data) => {
+  dataPool.forEach((data) => {
     if (data.name === name) {
       contests.push(data);
     }

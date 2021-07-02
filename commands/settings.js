@@ -1,9 +1,9 @@
-const temp = {
+const settings = {
   name: "settings",
   description_long: "Mozzz",
   description_short: "Change certain setttings for the bot",
   args: true,
-  usage: "~settings <args>",
+  usage: "settings <args>",
   execute(message, args) {
     message.channel.send(`You're argument was **${args[0]}**`);
   },
@@ -16,4 +16,4 @@ export const {
   usage,
   args,
   execute,
-} = temp;
+} = settings;

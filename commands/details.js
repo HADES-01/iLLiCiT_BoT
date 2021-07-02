@@ -1,4 +1,5 @@
 import { getByName } from "../fetch.js";
+import { createContestObject, hasWebsite, websites } from "../utils.js";
 import storage from "node-persist";
 
 let name = "details";
@@ -15,11 +16,33 @@ async function execute(message, args) {
     console.error("\x1b[31m==> Couldn't Get Configs\x1b[0m");
   }
   let name = args.join(" ");
-  let data = getByName(name)[0];
+  let data = createContestObject(getByName(name)[0]);
+  let website = hasWebsite(data.website.split(" ").join(""));
   let contestEmbed = {
     color: config.color,
     title: data.name,
-    fields: [],
+    description: website.description,
+    thumbnail: {
+      url: website.url,
+    },
+    fields: [
+      {
+        name: "Start Time",
+        value: `${data.start_date}/${data.start_month}/${data.start_year} at ${data.start_time}`,
+        inline: true,
+      },
+      {
+        name: "End Time",
+        value: `${data.end_date}/${data.end_month}/${data.end_year} at ${data.end_time}`,
+        inline: true,
+      },
+      {
+        name: "Duration",
+        value: `${data.duration_hrs} hours and ${data.duration_min} minutes`,
+        inline: false,
+      },
+    ],
+    timestamp: new Date(),
   };
   if (!data) {
     message.reply("Not found!!!");
