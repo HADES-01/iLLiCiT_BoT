@@ -1,4 +1,4 @@
-// import express from "express";
+import express from "express";
 import dotenv from "dotenv";
 import Discord from "discord.js";
 import config, { prefix } from "./config.js";
@@ -8,7 +8,7 @@ import { everyHour, seed } from "./fetch.js";
 import disbut from "discord-buttons";
 import { createContestEmbed, newRow } from "./utils.js";
 
-// let app = express();
+let app = express();
 const client = new Discord.Client();
 disbut(client);
 dotenv.config();
@@ -144,6 +144,6 @@ async function onMessage(message) {
   }
 }
 
-// app.listen(3000, function () {
-//   console.log("App is Started at Port 3000");
-// });
+app.listen(process.env.PORT || 3000, function () {
+  console.log("App is Started at Port 3000");
+});
