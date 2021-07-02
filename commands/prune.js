@@ -2,7 +2,9 @@ import storage from "node-persist";
 storage.init({ dir: ".node-persist/storage" });
 const exp = {
   name: "prune",
-  description: "Remove certain no. of messages",
+  description_short: "Remove certain no. of messages",
+  description_long: "Remove certain no. of messages",
+  usage: "prune <amount>",
   args: false,
   async execute(message, args) {
     let config = await storage.getItem("config");
@@ -23,4 +25,11 @@ const exp = {
   },
 };
 
-export const { name, description, args, execute } = exp;
+export const {
+  name,
+  description_short,
+  description_long,
+  args,
+  execute,
+  usage,
+} = exp;

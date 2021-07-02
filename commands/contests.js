@@ -4,7 +4,9 @@ import configs from "../config.js";
 import storage from "node-persist";
 
 const name = "contests",
-  description = "Get Contests Info",
+  description_short = "Get Contests Info",
+  description_long = "Get Contests Info",
+  usage = "contests <sub command>",
   args = false;
 
 let config;
@@ -71,4 +73,4 @@ async function messageHandler(data, message, type) {
     });
 }
 
-export { name, description, args, execute };
+export { name, description_short, description_long, args, execute, usage };

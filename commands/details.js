@@ -2,7 +2,9 @@ import { getByName } from "../fetch.js";
 import storage from "node-persist";
 
 let name = "details";
-let description = "Ping!";
+let description_short = "Gets details for certain contests by name.";
+let description_long = "Gets details for certain contests by name.";
+let usage = `details <contest name>`;
 let args = true;
 async function execute(message, args) {
   let config;
@@ -25,4 +27,4 @@ async function execute(message, args) {
   }
   message.channel.send({ embed: contestEmbed });
 }
-export { name, args, description, execute };
+export { name, args, description_short, description_long, execute, usage };
