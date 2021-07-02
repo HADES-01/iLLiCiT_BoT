@@ -24,6 +24,7 @@ async function seed() {
 
 async function everyHour() {
   try {
+    await axios.get("https://illicit-bots.herokuapp.com/");
     let { data } = await axios.get(config.url);
     let ret = [];
     if (!dataPool) {

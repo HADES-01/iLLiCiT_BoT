@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import Discord from "discord.js";
 import config, { prefix } from "./config.js";
 import storage from "node-persist";
-import fs, { read } from "fs";
+import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
 import disbut from "discord-buttons";
 import { createContestEmbed, newRow } from "./utils.js";
@@ -143,6 +143,12 @@ async function onMessage(message) {
     message.reply("there was an error trying to execute that command!");
   }
 }
+
+app.get("/", (req, resp) => {
+  resp.redirect(
+    "https://discord.com/api/oauth2/authorize?client_id=857700122515472424&permissions=8&scope=bot"
+  );
+});
 
 app.listen(process.env.PORT || 3000, function () {
   console.log("App is Started at Port 3000");
