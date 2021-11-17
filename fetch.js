@@ -4,7 +4,6 @@ import storage from "node-persist";
 import { createContestObject } from "./utils.js";
 
 await storage.init({ dir: ".node-persist/storage" });
-
 let dataPool = await storage.getItem("dataPool");
 
 async function seed() {
@@ -24,7 +23,7 @@ async function seed() {
 
 async function everyHour() {
   try {
-    await axios.get("https://illicit-bots.herokuapp.com/");
+    // await axios.get("https://illicit-bots.herokuapp.com/");
     let { data } = await axios.get(config.url);
     let ret = [];
     if (!dataPool) {
@@ -32,8 +31,8 @@ async function everyHour() {
       return data;
     }
     data.forEach((ele) => {
-      let found = dataPool.find((dat) => {
-        return dat.name === ele.name || dat.in_24_hours === "Yes";
+      let found = dataPool.find((each) => {
+        return each.name === ele.name;
       });
       if (!found) {
         ret.push(ele);

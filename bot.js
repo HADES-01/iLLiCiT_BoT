@@ -6,7 +6,12 @@ import storage from "node-persist";
 import fs from "fs";
 import { everyHour, seed } from "./fetch.js";
 import disbut from "discord-buttons";
-import { createContestEmbed, newRow } from "./utils.js";
+import {
+  createContestEmbed,
+  newRow,
+  createContestObject,
+  hasWebsite,
+} from "./utils.js";
 
 let app = express();
 const client = new Discord.Client();
@@ -21,6 +26,7 @@ client.on("ready", ready);
 client.on("clickButton", clickButton);
 client.on("contestUpdate", contestUpdate);
 client.on("message", onMessage);
+client.on("guildCreate", newGuild);
 client.login(process.env.TOKEN);
 
 let commFiles = fs
@@ -40,6 +46,10 @@ async function handleEveryHour() {
   try {
     let temp = await everyHour();
     client.emit("contestUpdate", temp);
+    let curr = new Date();
+    client.next_prev.sweep(
+      (ele) => curr.getMilliseconds() - ele.timestamp > 86400000
+    );
   } catch (err) {
     console.log("\x1b[31m==> Unable to Update Database\x1b[0m", err);
   }
@@ -61,7 +71,7 @@ async function ready() {
     console.log("\x1b[31m==> Unable to Seed database\x1b[0m");
   }
   await handleEveryHour();
-  setInterval(handleEveryHour, 900000);
+  setInterval(handleEveryHour, 20000);
 }
 
 async function clickButton(button) {
@@ -101,14 +111,43 @@ async function clickButton(button) {
 
 function contestUpdate(dat) {
   config.webhooks.forEach((hook) => {
+    console.log(hook);
     const webhookClient = new Discord.WebhookClient(hook.ID, hook.TOKEN);
-    if (!dat.length) return;
+    console.log("here");
+    if (!dat) return;
     dat.forEach((ele) => {
-      const exampleEmbed = { color: config.color, title: `${ele.name}` };
+      let data = createContestObject(ele);
+      let website = hasWebsite(data.website.split(" ").join(""));
+      let contestEmbed = {
+        color: config.color,
+        title: data.name,
+        description: website.description,
+        thumbnail: {
+          url: website.url,
+        },
+        fields: [
+          {
+            name: "Start Time",
+            value: `${data.start_date}/${data.start_month}/${data.start_year} at ${data.start_time}`,
+            inline: true,
+          },
+          {
+            name: "End Time",
+            value: `${data.end_date}/${data.end_month}/${data.end_year} at ${data.end_time}`,
+            inline: true,
+          },
+          {
+            name: "Duration",
+            value: `${data.duration_hrs} hours and ${data.duration_min} minutes`,
+            inline: false,
+          },
+        ],
+        timestamp: new Date(),
+      };
       webhookClient.send("", {
         username: client.user.username,
         avatarURL: `https://cdn.discordapp.com/app-icons/${client.user.id}/${client.user.avatar}.png`,
-        embeds: [exampleEmbed],
+        embeds: [contestEmbed],
       });
     });
   });
@@ -137,11 +176,15 @@ async function onMessage(message) {
       message.reply(`I can't work like this.\n Give me some Args`);
       return;
     }
-    command.execute(message, args);
+    await command.execute(message, args);
   } catch (error) {
     console.error(error);
     message.reply("there was an error trying to execute that command!");
   }
+}
+
+function newGuild(guild) {
+  guild.config = config;
 }
 
 app.get("/", (req, resp) => {

@@ -45,6 +45,11 @@ async function execute(message, args) {
         value: `${data.duration_hrs} hours and ${data.duration_min} minutes`,
         inline: false,
       },
+      {
+        name: "Register",
+        value: `Visit [here](${data.url}) to register`,
+        inline: false,
+      },
     ],
     timestamp: new Date(),
   };
