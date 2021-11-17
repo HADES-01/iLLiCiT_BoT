@@ -111,9 +111,7 @@ async function clickButton(button) {
 
 function contestUpdate(dat) {
   config.webhooks.forEach((hook) => {
-    console.log(hook);
     const webhookClient = new Discord.WebhookClient(hook.ID, hook.TOKEN);
-    console.log("here");
     if (!dat) return;
     dat.forEach((ele) => {
       let data = createContestObject(ele);
